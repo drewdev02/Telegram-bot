@@ -1,28 +1,42 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
+import os
+import qrcode
+from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, ConversationHandler, Filters,MessageHandler
+from telegram import ChatAction
 
+IMPUT_TEXT = 0
 
 def start(update, context):
-    message = update.effective_message
-    message.reply_text('Click abajo para continuar', reply_markup=InlineKeyboardMarkup([
-        [InlineKeyboardButton(text="CLICK AQUI", callback_data="test")]]))
+    update.message.reply_text('Hola bienvenido')
 
-def help(Update, context):
-    message = update.effective_message
-    message.reply_text('Click abajo para continuar', reply_markup=InlineKeyboardMarkup([
-        [InlineKeyboardButton(text="Help me", callback_data="Help")]]))
+def help(update, context):
+    update.message.reply_text('Esta es la ayuda')    
+
+def qr(update, context):
+    update.message.reply_text('Envia un texto para generar un QR')
+    return IMPUT_TEXT
+def generate_qr(text):
+    filename = text + '.jpg'
+    img = qrcode.make(text)
+    img.save(filename)
+    return filename
+def send_qr(filename, chat):
+    chat.send_action(
+        action=ChatAction.UPLOAD_PHOTO,
+        timeout=None
+    )
+    chat.send_photo(
+        photo=open(filename, 'rb')
+    )
+    os.unlink(filename)
+
+def imput_text(update, context):
+  text = update.message.text
+  filename = generate_qr
+  chat = update.message.chat
+  send_qr(filename, chat)
+  return CommandHandler.END
+  
     
-
-def test(update, context):
-    message = update.effective_message
-    query = update.callback_query
-    query.answer()
-    
-
-    if query.data == 'test':
-        message.reply_text(text='SI, lo admito soy fan del chocolate!!')
-
-
 
 
 if __name__ == '__main__':
@@ -30,8 +44,22 @@ if __name__ == '__main__':
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler('start', start))
-    dp.add_handler(CallbackQueryHandler(test, pattern='test'))
+    dp.add_handler(CommandHandler('help', help))
+    dp.add_handler(ConversationHandler(
+        entry_points=[
+           CommandHandler('qr', qr)   
+            ],
+         states={
+         IMPUT_TEXT: [MessageHandler(Filters.text, IMPUT_TEXT)]
+            
+            },
+        fallbacks=[]
+        
+        
+        
+    ))
+    
     
     updater.start_polling()
-    print('bot is started')
+    print('bot is started Andrey uwu')
     updater.idle()
