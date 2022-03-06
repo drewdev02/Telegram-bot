@@ -26,7 +26,7 @@ def test(update, context):
 
 
 if __name__ == '__main__':
-    updater = Updater(token='5143590496:AAHGff4zeoyanB9Fnvw33foLLFADD2toPPQ')
+    updater = Updater(token='5157710415:AAFF7mqTrNzrH-a6JrOWCQQ5NN40JXs9zlM')
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler('start', start))
