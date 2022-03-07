@@ -61,5 +61,5 @@ if __name__ == '__main__':
     
     
     updater.start_polling()
-    print('bot is started Andrey uwu')
+    print('bot is started')
     updater.idle()
