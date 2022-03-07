@@ -9,16 +9,22 @@ def start(update, context):
     update.message.reply_text('Hola bienvenido')
 
 def help(update, context):
-    update.message.reply_text('Esta es la ayuda')    
+    update.message.reply_text('Envia /qr para generar un QR')    
 
-def qr(update, context):
+def qr_command_handler(update, context):
     update.message.reply_text('Envia un texto para generar un QR')
+    
     return IMPUT_TEXT
+
 def generate_qr(text):
+    
     filename = text + '.jpg'
+    
     img = qrcode.make(text)
     img.save(filename)
+    
     return filename
+
 def send_qr(filename, chat):
     chat.send_action(
         action=ChatAction.UPLOAD_PHOTO,
@@ -31,15 +37,18 @@ def send_qr(filename, chat):
 
 def imput_text(update, context):
   text = update.message.text
-  filename = generate_qr
+  filename = generate_qr(text)
   chat = update.message.chat
+  
   send_qr(filename, chat)
-  return CommandHandler.END
+  
+  return ConversationHandler.END
   
     
 
 
 if __name__ == '__main__':
+    
     updater = Updater(token='5157710415:AAFF7mqTrNzrH-a6JrOWCQQ5NN40JXs9zlM')
     dp = updater.dispatcher
 
@@ -47,16 +56,14 @@ if __name__ == '__main__':
     dp.add_handler(CommandHandler('help', help))
     dp.add_handler(ConversationHandler(
         entry_points=[
-           CommandHandler('qr', qr)   
+           CommandHandler('qr', qr_command_handler)   
             ],
          states={
-         IMPUT_TEXT: [MessageHandler(Filters.text, IMPUT_TEXT)]
+         IMPUT_TEXT: [MessageHandler(Filters.text, imput_text)]
             
-            },
+        },
+        
         fallbacks=[]
-        
-        
-        
     ))
     
     
